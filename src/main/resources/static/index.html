@@ -1,0 +1,44 @@
+<h1>
+  InfoWorld Java, Spring, JWT
+</h1>
+<button onclick="protectedAPI()">Protected</button>
+<div id="protectedMessage"></div>
+<hr>
+<input type="text" placeholder="username" id="username" />
+<input type="text" placeholder="password" id="password" />
+<div id="login-msg"></div>
+<button onclick="login()">Login</button>
+<script>
+  let token = null;
+  async function protectedAPI(){
+    let headers = {};
+    if (token) headers["Authorization"] = "Bearer " + token;
+    let response = await fetch("/protected", {
+      headers
+    });
+    let text = await response.text();
+    if (response.ok){
+      document.getElementById("protectedMessage").innerHTML = text;
+    } else {
+      document.getElementById("protectedMessage").innerHTML = "You must log in first";
+    }
+  }
+  async function login(){
+    let response = await fetch("/public/login", {
+      method: 'post',
+      body: JSON.stringify({username:document.getElementById("username").value,password:document.getElementById("password").value}),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    if (response.ok){
+      let text = await response.text();
+      token = text;
+      document.getElementById("login-msg").innerHTML = "Login success";
+    } else {
+      document.getElementById("login-msg").innerHTML = "Failed to login: " + response.status;
+    }
+    //alert(text);
+    //document.getElementById("protectedMessage").innerHTML = text;
+  }
+</script>
